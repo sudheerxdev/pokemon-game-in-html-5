@@ -2,68 +2,99 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title> GAME OVER </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Over</title>
     <style>
-        *{
-            margin-top: 10px;
-        }
-        body{
+        body {
+            margin: 0;
+            min-height: 100vh;
             text-align: center;
-            background: radial-gradient(circle, #fff 20%, #ccc);
+            background: radial-gradient(circle, #ffffff 20%, #cccccc);
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            position: relative;
         }
-        #tryagain:hover{
-            background-color: yellow;
-            color:royalblue;
-            border:5px solid royalblue;
-            box-shadow: 2px 2px 5px royalblue;
-        }
-        #div {
-            font-size: 50px;
+
+        #title {
+            margin-top: 25px;
+            font-size: 56px;
             color: #ffec00;
             text-shadow: -3px 0 darkblue, 0 3px darkblue, 0 -3px darkblue;
         }
-        #ash{
-            background-image: url("assets/ashlost2.jpg");
+
+        #ash {
+            margin: 30px auto 18px auto;
+            background-image: url('assets/ashlost2.jpg');
             background-repeat: no-repeat;
             background-size: contain;
-            margin-left: 420px;
-            margin-top: 30px;
-            width:500px;
-            height:400px;
-            margin-bottom: 10px;
-            //box-shadow: 5px 5px 5px #d3d8ed;
-            //border-radius: 500px;
-            animation : moveAsh 6s ease 1;
+            background-position: center;
+            width: min(90vw, 560px);
+            height: 420px;
+            animation: fadeIn 1.2s ease 1;
         }
-        #tryagain{
+
+        #support {
+            margin: 0 auto 12px auto;
+            width: min(90vw, 500px);
+            height: 120px;
+            background-image: url('assets/ashlost.jpg');
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
+            opacity: 0.9;
+        }
+
+        #tryagain {
             border-radius: 10px;
-            font-size: 30px;
+            font-size: 28px;
             font-weight: bolder;
             background-color: #1c70ff;
-            border:2px solid yellow;
+            border: 2px solid yellow;
             box-shadow: 2px 2px 5px yellow;
             color: #fffe00;
-            width:200px;
-            height:50px;
-            margin-left: -100px;
-            position: fixed;
+            width: 220px;
+            height: 56px;
+            cursor: pointer;
         }
-        @-webkit-keyframes moveAsh {
-            0%{
-                opacity:0;
-            }
-            100%{
-                 opacity:1;
-            }
+
+        #tryagain:hover {
+            background-color: yellow;
+            color: royalblue;
+            border: 5px solid royalblue;
+            box-shadow: 2px 2px 5px royalblue;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
+    <audio id="gameOverAudio" src="audio/smb3_game_over.mp3" preload="auto"></audio>
 
-<div id ="div"> Game Over !!! </div>
-<div id = "ash"> </div>
-<input type="button" id = "tryagain"
-       onclick='window.location.assign("1.Start the Game.html")' value="TRY AGAIN">
+    <div id="title">Game Over</div>
+    <div id="ash"></div>
+    <div id="support"></div>
+    <button id="tryagain">TRY AGAIN</button>
 
+    <script>
+        const gameOverAudio = document.getElementById('gameOverAudio');
+        gameOverAudio.volume = 0.5;
+        gameOverAudio.play().catch(() => {});
+
+        document.addEventListener('pointerdown', function startAudioOnce() {
+            gameOverAudio.play().catch(() => {});
+            document.removeEventListener('pointerdown', startAudioOnce);
+        });
+
+        document.getElementById('tryagain').addEventListener('click', () => {
+            localStorage.setItem('mylives', 3);
+            localStorage.setItem('myscore1', 0);
+            localStorage.setItem('myscore2', 0);
+            localStorage.setItem('myscore3', 0);
+            window.location.assign('1.Start The Game.html');
+        });
+    </script>
 </body>
 </html>

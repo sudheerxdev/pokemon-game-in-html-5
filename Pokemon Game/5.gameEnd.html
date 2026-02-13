@@ -2,80 +2,160 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title> The end </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The End</title>
     <style>
-        body{
+        body {
+            margin: 0;
+            min-height: 100vh;
             text-align: center;
             background: radial-gradient(circle, #fcffde 20%, #4daacc);
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            position: relative;
         }
-        span{
-            color: dodgerblue;
-            font-weight: 900;
-        }
-        #score{
-            font-size: 20px;
-            color: #ffec00;
-            text-shadow: 1px 1px 1px darkblue;
-        }
-        #div {
-            font-size: 50px;
+
+        .banner {
+            margin-top: 20px;
+            font-size: 56px;
             color: #ffec00;
             text-shadow: -3px 0 darkblue, 0 3px darkblue, 0 -3px darkblue;
         }
-        #ash{
-            background-image: url("assets/Ash_DP_1.png");
+
+        .score {
+            margin-top: 10px;
+            font-size: 26px;
+            color: #153a75;
+            font-weight: bold;
+        }
+
+        #stage {
+            position: relative;
+            width: 100%;
+            height: 72vh;
+        }
+
+        #ash {
+            position: absolute;
+            left: 50%;
+            top: 120px;
+            transform: translateX(-10%);
+            background-image: url('assets/Ash_DP_1.png');
             background-repeat: no-repeat;
             background-size: contain;
-            margin-left: 520px;
-            margin-top: -82px;
-            width:500px;
-            height:400px;
-            animation: moveAsh 4s ease 1;
-            //z-index: 2;
+            width: 520px;
+            height: 420px;
+            animation: moveAsh 1.2s ease-out 1;
         }
-        #pikachu{
-            background-image: url("assets/PikachuVictory.png");
+
+        #pikachu {
+            position: absolute;
+            left: 50%;
+            top: 250px;
+            transform: translateX(-80%);
+            background-image: url('assets/PikachuVictory.png');
             background-repeat: no-repeat;
             background-size: contain;
-            margin-left: 582px;
-            margin-top: -15px;
-            width:250px;
-            height:150px;
-            animation: movePika 4s ease 1 ;
-            z-index: -1;
+            width: 250px;
+            height: 180px;
+            animation: movePika 1.2s ease-out 1;
         }
-        @-webkit-keyframes moveAsh {
-            from{
-                margin-left: -500px;
-            }
-            to{
-                margin-left: 520px;
-            }
+
+        #decorLeft, #decorRight {
+            position: absolute;
+            top: 140px;
+            width: 240px;
+            height: 240px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.95;
         }
-        @-webkit-keyframes movePika {
-            from{
-                //background-image: none;
-                margin-left: 1150px; //-100  //1100
-                //transform : scaleX(1);
-            }
-            to{
-                margin-left: 582px;  //562
-                //transform : scaleX(1);
-            }
+
+        #decorLeft {
+            left: 8%;
+            background-image: url('assets/Ash_and_Pikachu.png');
+        }
+
+        #decorRight {
+            right: 8%;
+            background-image: url('assets/pokemon.png');
+        }
+
+        #playAgain {
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            background-color: #1c70ff;
+            border: 2px solid yellow;
+            box-shadow: 2px 2px 5px yellow;
+            color: #fffe00;
+            width: 220px;
+            height: 52px;
+            cursor: pointer;
+        }
+
+        #playAgain:hover {
+            background-color: yellow;
+            color: royalblue;
+            border: 4px solid royalblue;
+            box-shadow: 2px 2px 5px royalblue;
+        }
+
+        @keyframes moveAsh {
+            from { transform: translate(-140%, 0); opacity: 0; }
+            to { transform: translateX(-10%); opacity: 1; }
+        }
+
+        @keyframes movePika {
+            from { transform: translate(80%, 0); opacity: 0; }
+            to { transform: translateX(-80%); opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <audio src="pokeSong/02.-pokemon-i-choose-you-(cut).mp3" autoplay > </audio>
-    <div id = "div"> Victory </div>
-    <p id  = "para"> </p>
-    <div id = "pikachu"> </div>
-    <div id = "ash"> </div>
+    <audio id="victorySong" src="pokeSong/02.-pokemon-i-choose-you-(cut).mp3" preload="auto" loop></audio>
+    <audio id="endingSfx" src="audio/34-ending.mp3" preload="auto"></audio>
+
+    <div class="banner">Victory</div>
+    <div class="score" id="scoreText">Your score is: 0</div>
+
+    <div id="stage">
+        <div id="decorLeft"></div>
+        <div id="decorRight"></div>
+        <div id="pikachu"></div>
+        <div id="ash"></div>
+    </div>
+
+    <button id="playAgain">Play Again</button>
+
     <script>
-        var score = localStorage.getItem("myscore3");
-        score =Number(score);
-        document.getElementById("para").innerHTML = '<span>' + 'Your score is : ' + '</span>'
-        + '<span id = "score">' + score + '</span>';
+        const score = Number(localStorage.getItem('myscore3')) || 0;
+        document.getElementById('scoreText').textContent = 'Your score is: ' + score;
+
+        const victorySong = document.getElementById('victorySong');
+        const endingSfx = document.getElementById('endingSfx');
+
+        victorySong.volume = 0.45;
+        endingSfx.volume = 0.45;
+
+        function startAudio() {
+            endingSfx.play().catch(() => {});
+            setTimeout(() => {
+                victorySong.play().catch(() => {});
+            }, 600);
+            document.removeEventListener('pointerdown', startAudio);
+        }
+
+        document.addEventListener('pointerdown', startAudio, { once: true });
+        startAudio();
+
+        document.getElementById('playAgain').addEventListener('click', () => {
+            localStorage.setItem('mylives', 3);
+            localStorage.setItem('myscore1', 0);
+            localStorage.setItem('myscore2', 0);
+            localStorage.setItem('myscore3', 0);
+            window.location.assign('1.Start The Game.html');
+        });
     </script>
 </body>
 </html>

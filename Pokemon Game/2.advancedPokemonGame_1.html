@@ -1,292 +1,255 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokemon Level 1</title>
     <style>
-        html ,body{
-            //background: black;
-            padding:0px;
-            margin:0px;
-            width:100%;
+        html, body {
+            margin: 0;
+            width: 100%;
             height: 100%;
+            overflow: hidden;
+            background: #000;
         }
+
         #mycanvas {
-            //width:100vw;
-            //height:100vw;
+            display: block;
+            width: 100vw;
+            height: 100vh;
             border: 3px solid #07a634;
             background-image: url('assets/background1.png');
-            background-size:cover ;
+            background-size: cover;
+            background-position: center;
+        }
+
+        #hint {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 12px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            border-radius: 8px;
+            z-index: 20;
         }
     </style>
 </head>
-
 <body>
+    <div id="hint">Hold click/touch to move Pikachu</div>
 
-<audio src = "audio/smb3_enter_level.mp3" id = "levelStart"></audio>
-<audio src = "audio/smb3_level_clear.mp3" id = "levelFinished"></audio>
-<audio src = "audio/smb3_coin.mp3" id = "crossEnemy"></audio>
-<audio src = "audio/smb3_player_down.mp3" id = "touchEnemy"></audio>
-<audio src = "audio/smb3_game_over.mp3" id = "timeFinished"></audio>
-<audio src = "audio/12-big-island.mp3" id = "bg"></audio>
+    <audio src="audio/smb3_enter_level.wav" id="levelStart" preload="auto"></audio>
+    <audio src="audio/smb3_level_clear.mp3" id="levelFinished" preload="auto"></audio>
+    <audio src="audio/smb3_coin.mp3" id="crossEnemy" preload="auto"></audio>
+    <audio src="audio/smb_touch.wav" id="touchEnemy" preload="auto"></audio>
+    <audio src="audio/smb3_hurry_up.wav" id="timeFinished" preload="auto"></audio>
+    <audio src="audio/22-mini-fortress.mp3" id="bg" preload="auto" loop></audio>
 
+    <canvas id="mycanvas"></canvas>
 
-<canvas id = "mycanvas">
-</canvas>
+    <script>
+        const canvas = document.getElementById('mycanvas');
+        const ctx = canvas.getContext('2d');
 
-<script>
-    var bg = document.getElementById("bg");
-    bg.play();
-    var canvas = document.getElementById('mycanvas');
-    var scores = document.getElementById('myscores');
-    var ctx = canvas.getContext('2d');
-    var gameOver = false;
-    var level = 1,score = 0,i=0,timer = 800,time;
+        const audio = {
+            levelStart: document.getElementById('levelStart'),
+            levelFinished: document.getElementById('levelFinished'),
+            crossEnemy: document.getElementById('crossEnemy'),
+            touchEnemy: document.getElementById('touchEnemy'),
+            timeFinished: document.getElementById('timeFinished'),
+            bg: document.getElementById('bg')
+        };
 
-    var lives = localStorage.getItem("mylives");
-    lives = Number(lives);
+        audio.bg.volume = 0.35;
+        audio.levelStart.volume = 0.6;
+        audio.crossEnemy.volume = 0.35;
 
-    canvas.width = screen.width;//window.innerWidth;
-    canvas.height = window.innerHeight;
-    GAME_WIDTH = canvas.width; // 1360.5
-    GAME_HEIGHT = canvas.height; // 592.5
+        let gameOver = false;
+        let score = 0;
+        let enemyPassed = 0;
+        let timer = 800;
+        let lives = Number(localStorage.getItem('mylives'));
+        if (!Number.isFinite(lives) || lives <= 0) lives = 3;
 
-    var object = {};
-    object.player = new Image();
-    object.player.src = "assets/pika.png";
-
-    object.goal = new Image();
-    object.goal.src = "assets/pokeball.png";
-
-    object.enemy = [];
-    object.enemy[0] = new Image();
-    object.enemy[0].src = "grass/bulbasaur.png";
-    object.enemy[1] = new Image();
-    object.enemy[1].src = "grass/chikorita1.png";
-    object.enemy[2] = new Image();
-    object.enemy[2].src = "grass/Treecko2.png";
-    object.enemy[3] = new Image();
-    object.enemy[3].src = "grass/Bellsprout.png";
-    object.enemy[4] = new Image();
-    object.enemy[4].src = "grass/ivysaur.png";
-
-    var enemy = [
-        {
-            x : 170,
-            y : 100,
-            w : 70,
-            h : 70,
-            speedY : 5,
-        },
-        {
-            x : 390,
-            y : 350,
-            w : 60,
-            h : 70,
-            speedY : 6,
-        },
-        {
-            x : 610,
-            y : 50,
-            w : 70,
-            h : 70,
-            speedY : 4,
-        },
-        {
-            x : 820,
-            y : 10,
-            w : 60,
-            h : 70,
-            speedY : 6,
-        },
-        {
-            x : 1050,
-            y : 350,
-            w : 70,
-            h : 70,
-            speedY : 5,
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            goal.x = canvas.width - 100;
+            goal.y = Math.max(30, (canvas.height / 2) - 40);
         }
-    ];
 
-    var player = {
-        x:5,
-        y:250,
-        w:50,
-        h:50,
-        speedX:3,
-        isMoving:false
-    }
+        const sprites = {
+            player: new Image(),
+            goal: new Image(),
+            enemy: [new Image(), new Image(), new Image(), new Image(), new Image()]
+        };
 
-    var goal = {
-        x: GAME_WIDTH - 100,
-        y:240,
-        w:80,
-        h:80
-    }
+        sprites.player.src = 'assets/pika.png';
+        sprites.goal.src = 'assets/pokeball.png';
+        sprites.enemy[0].src = 'grass/bulbasaur.png';
+        sprites.enemy[1].src = 'grass/chikorita1.png';
+        sprites.enemy[2].src = 'grass/Treecko2.png';
+        sprites.enemy[3].src = 'grass/Bellsprout.png';
+        sprites.enemy[4].src = 'grass/ivysaur.png';
 
-    canvas.addEventListener("mousedown",function(){
-        //console.log("Clicked the canvas!");
-        player.isMoving = true;
-    });
-    canvas.addEventListener("mouseup",function(){
-        //console.log("Clicked the canvas!");
-        player.isMoving = false;
-    });
-    canvas.addEventListener("touchstart",function(){
-        //console.log("Clicked the canvas!");
-        player.isMoving = true;
-    });
-    canvas.addEventListener("touchend",function(){
-        //console.log("Clicked the canvas!");
-        player.isMoving = false;
-    });
+        const enemy = [
+            { x: 170, y: 100, w: 70, h: 70, speedY: 5 },
+            { x: 390, y: 350, w: 60, h: 70, speedY: 6 },
+            { x: 610, y: 50, w: 70, h: 70, speedY: 4 },
+            { x: 820, y: 10, w: 60, h: 70, speedY: 6 },
+            { x: 1050, y: 350, w: 70, h: 70, speedY: 5 }
+        ];
 
+        const player = { x: 5, y: 250, w: 50, h: 50, speedX: 3.2, isMoving: false };
+        const goal = { x: 0, y: 0, w: 80, h: 80 };
 
-    function colliding(r1,r2){
-        var condition1 = Math.abs(r1.x - r2.x) < Math.max(r1.w,r2.w);
-        var condition2 = Math.abs(r1.y - r2.y) < Math.max(r1.h,r2.h)
-        if(condition1&&condition2){
-            return true;
-        }else{
-            return false;
+        function playSfx(key) {
+            const sound = audio[key];
+            sound.currentTime = 0;
+            sound.play().catch(() => {});
         }
-    }
 
-    var update = function () {
+        function startAudioOnce() {
+            playSfx('levelStart');
+            audio.bg.play().catch(() => {});
+            canvas.removeEventListener('pointerdown', startAudioOnce);
+        }
 
-        // for collision between player and enemy
-        enemy.forEach(function(element,index) {
-            if (colliding(element, player)) {
-                lives--;
-                if( lives <= 0){
-                    gameOver = true;
-                    lives = 3;
-                    window.location.assign("6.gameOver.html");
+        canvas.addEventListener('pointerdown', () => {
+            player.isMoving = true;
+            audio.bg.play().catch(() => {});
+        });
+        canvas.addEventListener('pointerup', () => { player.isMoving = false; });
+        canvas.addEventListener('pointerleave', () => { player.isMoving = false; });
+        canvas.addEventListener('pointercancel', () => { player.isMoving = false; });
+        canvas.addEventListener('pointerdown', startAudioOnce);
+
+        function colliding(r1, r2) {
+            return (
+                Math.abs(r1.x - r2.x) < Math.max(r1.w, r2.w) * 0.7 &&
+                Math.abs(r1.y - r2.y) < Math.max(r1.h, r2.h) * 0.7
+            );
+        }
+
+        function resetPlayer() {
+            player.x = 5;
+            player.y = Math.max(20, (canvas.height / 2) - 25);
+            player.isMoving = false;
+            enemyPassed = 0;
+        }
+
+        function loseLifeAndMaybeEnd(reason) {
+            lives -= 1;
+            localStorage.setItem('mylives', lives);
+
+            if (lives <= 0) {
+                localStorage.setItem('mylives', 3);
+                audio.bg.pause();
+                gameOver = true;
+                window.location.assign('6.gameOver.html');
+                return;
+            }
+
+            if (reason === 'enemy') playSfx('touchEnemy');
+            if (reason === 'time') playSfx('timeFinished');
+            resetPlayer();
+            timer = Math.max(timer, 150);
+        }
+
+        function update() {
+            const hitEnemy = enemy.some((element) => colliding(element, player));
+            if (hitEnemy) {
+                loseLifeAndMaybeEnd('enemy');
+            }
+
+            if (gameOver) return;
+
+            if (player.x >= goal.x - 15) {
+                audio.bg.pause();
+                playSfx('levelFinished');
+                gameOver = true;
+                localStorage.setItem('myscore1', score);
+                localStorage.setItem('mylives', lives);
+                setTimeout(() => window.location.assign('3.advancedPokemonGame_2.html'), 350);
+                return;
+            }
+
+            enemy.forEach((element) => {
+                element.y += element.speedY;
+                if (element.y >= canvas.height - element.h - 5 || element.y <= 5) {
+                    element.speedY *= -1;
                 }
-                bg.pause();
-                document.getElementById("touchEnemy").play();
-                window.alert("\n\n   GAME OVER  !!!! \n\n   YOUR SCORE IS : " + score +"\n\n");
-                gameOver = true;
-                //window.location = "";
+            });
+
+            if (player.isMoving) {
+                player.x += player.speedX;
             }
-        });
 
-        // when player reaches the goal
-        //console.log(window.innerHeight);
-        if(player.x >= canvas.width - 70){
-            bg.pause();
-            document.getElementById("levelFinished").play();
-            alert("\n\n   CONGRATS !!! \n\n   YOUR SCORE IS : " + score +"\n\n");
-            gameOver = true;
-            level = 2;
-            window.location.assign("3.advancedPokemonGame_2.html");
-            //location.reload();
-        }
-
-        enemy.forEach(function(element,index) {
-            element.y += element.speedY;
-            if(element.y >= GAME_HEIGHT - 85 || element.y <=0){
-                element.speedY *= -1;
+            while (enemyPassed < enemy.length && player.x > enemy[enemyPassed].x) {
+                score += 1;
+                playSfx('crossEnemy');
+                enemyPassed += 1;
             }
-        });
 
-        if(player.isMoving == true){
-            player.x += player.speedX;
-        }
-
-        // for score
-        /*enemy.forEach(function(element,index) {
-         if(player.x > element.x){
-         score = score + 1;
-         }
-         });*/
-        for(;i < enemy.length ;) {
-            //console.log(i);
-            if(player.x > enemy[i].x ){
-                document.getElementById("crossEnemy").play();
-                score = score + 1;
-                updateScore = true;
-                i++;
-            }else{
-                break;
+            timer -= 1;
+            if (timer <= 0) {
+                loseLifeAndMaybeEnd('time');
+                timer = 800;
             }
         }
 
-        // for timer
-        timer--;
-        //console.log(timer);
-        if(timer <= 0){
-            lives--;
-            if( lives <= 0){
-                gameOver = true;
-                lives = 3;
-                window.location.assign("6.gameOver.html");
-            }
-            bg.pause();
-            gameOver = true;
-            document.getElementById("timeFinished").play();
-            alert("\n\n TIMES UP  !!!! \n\n YOUR SCORE IS : " + score +"\n\n");
+        function drawHud() {
+            ctx.strokeStyle = 'red';
+            ctx.strokeRect(canvas.width - 200, 10, 180, 120);
+            ctx.fillStyle = 'black';
+            ctx.fillRect(canvas.width - 200, 10, 180, 120);
+
+            ctx.font = '20px Arial';
+            ctx.fillStyle = 'white';
+            ctx.fillText('SCORE:', canvas.width - 190, 42);
+            ctx.fillStyle = 'deepskyblue';
+            ctx.fillText(String(score), canvas.width - 75, 42);
+
+            ctx.fillStyle = 'white';
+            ctx.fillText('TIME:', canvas.width - 190, 78);
+            ctx.fillStyle = 'red';
+            ctx.fillText(String(Math.max(0, timer)), canvas.width - 75, 78);
+
+            ctx.fillStyle = 'white';
+            ctx.fillText('LIVES:', canvas.width - 190, 114);
+            ctx.fillStyle = 'deeppink';
+            ctx.fillText(String(lives), canvas.width - 75, 114);
         }
 
-    }
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    var draw = function() {
-        // clear the screen
-        ctx.clearRect(0,0,GAME_WIDTH,GAME_HEIGHT);
-        ctx.fillStyle = "rgb(0,200,0)"; /// we are filling ink
+            enemy.forEach((element, index) => {
+                ctx.drawImage(sprites.enemy[index], element.x, element.y, element.w, element.h);
+            });
 
-        //Draw enemies
-        enemy.forEach(function (element,index) {
-            ctx.drawImage(object.enemy[index],element.x,element.y,element.w,element.h);
-        });
+            ctx.drawImage(sprites.player, player.x, player.y, player.w, player.h);
+            ctx.drawImage(sprites.goal, goal.x, goal.y, goal.w, goal.h);
+            drawHud();
+        }
 
-        //Draw player
-        ctx.fillStyle = "rgb(200,0,0)";
-        ctx.drawImage(object.player,player.x,player.y,player.w,player.h);
+        function render() {
+            draw();
+            update();
 
-        // Draw Goal
-        ctx.fillStyle = "rgb(100,100,230)";
-        ctx.drawImage(object.goal,goal.x,goal.y,goal.w,goal.h);
+            if (!gameOver) {
+                localStorage.setItem('myscore1', score);
+                localStorage.setItem('mylives', lives);
+                window.requestAnimationFrame(render);
+            }
+        }
 
-        // giving box red border ang blue background color
-        ctx.strokeStyle = "red";
-        ctx.strokeRect(GAME_WIDTH-200,10,170,120);
-        ctx.fillStyle = "black";
-        ctx.fillRect(GAME_WIDTH-200,10,170,120);
-
-        ctx.font = "20px arial";
-        ctx.fillStyle = "white";
-        ctx.fillText("SCORE : ",GAME_WIDTH-190,45);
-        ctx.font = "25px arial";
-        ctx.fillStyle = "blue";
-        ctx.fillText(score,GAME_WIDTH-60,45);
-        ctx.font = "20px arial";
-        ctx.fillStyle = "white";
-        ctx.fillText("TIME LEFT : ",GAME_WIDTH-190,80);
-        ctx.fillStyle = "red";
-        time  = timer - 2;
-        if(time <= 0) time = 0; // otherwise it will show -1
-        ctx.fillText(time,GAME_WIDTH-70,80);
-        ctx.font = "25px arial";
-        ctx.fillStyle = "white";
-        ctx.fillText("Life : ",GAME_WIDTH-190,115);
-        ctx.fillStyle = "deeppink";
-        ctx.fillText(lives,GAME_WIDTH-60,115);
-
-    }
-
-    var render =  function () {
-        draw();
-        update();
-
-        if(gameOver == false)
-            window.requestAnimationFrame(render);
-
-        localStorage.setItem("myscore1",score);
-        localStorage.setItem("mylives",lives);
-
-    }
-
-    render();
-
-</script>
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        resetPlayer();
+        render();
+    </script>
 </body>
 </html>

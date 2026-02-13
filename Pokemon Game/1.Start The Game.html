@@ -1,210 +1,359 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title> Pocket Monsters </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pocket Monsters</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        *{
-            padding:0px;
-            margin:0px;
+        body {
+            width: 100%;
+            min-height: 100vh;
+            overflow: hidden;
+            background: radial-gradient(circle, #ffcccc 20%, #9999ff);
+            position: relative;
+            font-family: Arial, sans-serif;
+        }
 
-        }
-        body{
-            width:100%;
-            height:100%;
-            //background-image:url("assets/pokemon-wallpaper-005.jpg");
-            //background-size:61%;
-            //background-repeat: no-repeat;
-            background: radial-gradient(circle, #FCC 20%, #99F);
-            //background-color: #99FFCC; FFCCE5
-            //background-position-x:270px ;
-            //background-position-y:10px;
-        }
-        #play:hover{
-            background-color: yellow;
-            color:royalblue;
-            border:5px solid royalblue;
-            box-shadow: 2px 2px 5px royalblue;
-        }
-        #play{
+        #play {
+            position: absolute;
+            left: 50%;
+            bottom: 40px;
+            transform: translateX(-50%);
             border-radius: 10px;
             font-size: 30px;
             font-weight: bolder;
             background-color: #1c70ff;
-            border:2px solid yellow;
+            border: 2px solid yellow;
             box-shadow: 2px 2px 5px yellow;
             color: #fffe00;
-            width:200px;
-            height:50px;
-            margin-top:530px;
-            margin-left: 590px;
+            width: 220px;
+            height: 54px;
+            cursor: pointer;
+            z-index: 10;
         }
-        #ashnpikachu{
+
+        #play:hover {
+            background-color: yellow;
+            color: royalblue;
+            border: 5px solid royalblue;
+            box-shadow: 2px 2px 5px royalblue;
+        }
+
+        #preloadStatus {
+            position: absolute;
+            left: 50%;
+            bottom: 104px;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.45);
+            padding: 6px 10px;
+            border-radius: 8px;
+            z-index: 11;
+        }
+
+        #ashnpikachu {
             position: absolute;
             background-image: url("assets/Ash_XY.png");
             background-repeat: no-repeat;
             background-size: contain;
-            margin-left: 0px;
-            margin-top: 100px;
-            width:500px;
-            height:400px;
+            left: 0;
+            top: 100px;
+            width: 500px;
+            height: 400px;
             animation: moveAsh 4s linear infinite;
         }
 
-        #poke{
+        #poke {
             position: absolute;
             background-image: url("assets/pokemon.png");
             background-repeat: no-repeat;
             background-size: contain;
-            margin-left: 500px;
-            margin-top: -100px;
-            width:500px;
-            height:400px;
+            left: 500px;
+            top: -100px;
+            width: 500px;
+            height: 400px;
             animation: move 2s ease 1;
-            /*position: absolute;
-            margin-left:100px;  // 480
-            margin-top: 30px;  // -80
-            width:600px;
-            height:400px;
-            background-image:url("assets/pokemon.png");
-            background-size:contain;
-            background-repeat: no-repeat;
-            animation:move 2s ease 1;*/
         }
-        #ash2{
+
+        #ash2 {
             position: absolute;
             background-image: url("assets/Anime_Ash.png");
             background-repeat: no-repeat;
             background-size: contain;
-            margin-left: 1000px;
-            margin-top: 100px;
-            width:500px;
-            height:400px;
+            left: 1000px;
+            top: 100px;
+            width: 500px;
+            height: 400px;
             animation: Ash2 4s ease 1;
         }
-        #charizard{
+
+        #charizard {
             position: absolute;
             background-image: url("assets/charizard3.png");
             background-repeat: no-repeat;
             background-size: contain;
-            margin-left: 300px;
-            margin-top: 150px;
-            width:600px;
-            height:380px;
+            left: 300px;
+            top: 150px;
+            width: 600px;
+            height: 380px;
             animation: char 4s ease-out 1;
         }
-        @-webkit-keyframes moveAsh {
-            0%{
-                transform: rotateZ(0deg);
-            }
-            25%{
-                transform: rotateZ(-10deg);
-            }
-            50%{
-                transform: rotateZ(0deg);
-            }
-            75%{
-                transform: rotateZ(10deg);
-            }
-            100%{
-                transform: rotateZ(0deg);
-            }
+
+        @keyframes moveAsh {
+            0% { transform: rotateZ(0deg); }
+            25% { transform: rotateZ(-10deg); }
+            50% { transform: rotateZ(0deg); }
+            75% { transform: rotateZ(10deg); }
+            100% { transform: rotateZ(0deg); }
         }
 
-        @-webkit-keyframes Ash2 {
-            0%{
-                margin-top:-400px;
-            }
-            50%{
-                margin-bottom: -400px;
-            }
-            100%{
-                margin-top: 100px;
-            }
+        @keyframes Ash2 {
+            0% { top: -400px; }
+            100% { top: 100px; }
         }
 
-        @-webkit-keyframes char{
-            0%{
-                margin-left:-700px;
-            }
-            50%{
-              margin-left: 400px;
-            }
-            100%{
-                margin-left: 300px;
-            }
+        @keyframes char {
+            0% { left: -700px; }
+            50% { left: 400px; }
+            100% { left: 300px; }
         }
-        @-webkit-keyframes move{
-            0%{
+
+        @keyframes move {
+            0% {
                 opacity: 0;
-                background-image: none;
-                width:100px;
-                height:50px;
+                width: 100px;
+                height: 50px;
                 transform: rotateZ(0deg);
             }
-            50%{
+            50% {
                 opacity: 0;
-                width:100px;
-                height:50px;
+                width: 100px;
+                height: 50px;
                 transform: rotateZ(0deg);
             }
-            100%{
+            100% {
                 opacity: 1;
-                width:500px;
-                height:400px;
+                width: 500px;
+                height: 400px;
                 transform: rotateZ(720deg);
             }
         }
     </style>
-
 </head>
-
 <body>
-<div id = "ashnpikachu"> </div>
-<div id = "ash2"> </div>
-<div id = "charizard"> </div>
-<div id = "poke" >  </div>
+    <div id="ashnpikachu"></div>
+    <div id="ash2"></div>
+    <div id="charizard"></div>
+    <div id="poke"></div>
 
-<audio  src="pokeSong/mixpokerap.mp3" autoplay volume = "0.4" loop ></audio>
-<input type="button" name = "button" id = "play"
-onclick = "start()" value = "Play">
+    <audio id="bgm" src="pokeSong/mixpokerap.mp3" loop preload="auto"></audio>
+    <div id="preloadStatus">Ready</div>
+    <input type="button" id="play" value="Play">
 
-<script>
-    var count = 300,left,right,chari = document.getElementById("charizard");
-    var lives = 3;
-    function start() {
-        left = setInterval("charizardMoveLeft()",10);
-    }
-    function charizardMoveLeft() {
-        if(count > 100){
-            chari.style.marginLeft = count + "px" ;
-            count = count - 2;
-        }else{
-            stopLeft();
+    <script>
+        let count = 300;
+        let leftInterval = null;
+        let rightInterval = null;
+        const lives = 3;
+        const chari = document.getElementById("charizard");
+        const playBtn = document.getElementById("play");
+        const bgm = document.getElementById("bgm");
+        const preloadStatus = document.getElementById("preloadStatus");
+
+        const allImageAssets = [
+            "assets/12716916_181295572242154_1952637783_n.jpg",
+            "assets/481909.png",
+            "assets/Anime_Ash.png",
+            "assets/ashlost.jpg",
+            "assets/ashlost2.jpg",
+            "assets/Ash_and_Pikachu.png",
+            "assets/Ash_anime.png",
+            "assets/Ash_DP_1.png",
+            "assets/ash_ketchum (2).png",
+            "assets/Ash_Ketchum.png",
+            "assets/Ash_XY.png",
+            "assets/background.png",
+            "assets/background1.png",
+            "assets/background2.jpg",
+            "assets/ball.png",
+            "assets/bulbasaur.png",
+            "assets/charizad.png",
+            "assets/charizard2.png",
+            "assets/charizard3.png",
+            "assets/cropped-1366-768-592678.jpg",
+            "assets/drowsy.png",
+            "assets/gengar.png",
+            "assets/images (1).jpg",
+            "assets/images.jpg",
+            "assets/meow.png",
+            "assets/pika.png",
+            "assets/pikachu.png",
+            "assets/PikachuVictory.png",
+            "assets/pokeball.png",
+            "assets/pokeball2.jpg",
+            "assets/pokemon-wallpaper-004.jpg",
+            "assets/pokemon-wallpaper-005.jpg",
+            "assets/pokemon-wallpaper-017.jpg",
+            "assets/pokemon.png",
+            "assets/water.png",
+            "assets/water2.jpg",
+            "fire/Arcanine.png",
+            "fire/charizard.png",
+            "fire/charizard3.png",
+            "fire/charmander2.png",
+            "fire/charmander3.png",
+            "fire/Charmeleon.png",
+            "fire/Charmeleon2.png",
+            "fire/fire2.jpg",
+            "fire/fire3.jpg",
+            "fire/fire4.jpg",
+            "fire/fire5.png",
+            "fire/fire6.jpg",
+            "fire/growlithe.png",
+            "fire/growlithe2.png",
+            "fire/Magmar.png",
+            "fire/Magmar2.png",
+            "fire/Magmar3.png",
+            "fire/Rapidash.png",
+            "fire/Rapidash2.png",
+            "grass/Bellsprout.png",
+            "grass/bulbasaur.png",
+            "grass/chikorita.png",
+            "grass/chikorita1.png",
+            "grass/images.jpg",
+            "grass/ivysaur.png",
+            "grass/Treecko.png",
+            "grass/Treecko2.png",
+            "grass/venusaur.png",
+            "water/aligator.png",
+            "water/blastoise1.png",
+            "water/Gyarados.png",
+            "water/Gyarados2.png",
+            "water/krabby.png",
+            "water/Mega_Blastoise.png",
+            "water/mudkip.png",
+            "water/psyduck1.png",
+            "water/Squirtle2.png"
+        ];
+
+        const allAudioAssets = [
+            "audio/03-mario-original-sound-effect-library.mp3",
+            "audio/08-ocean-side.mp3",
+            "audio/22-mini-fortress.mp3",
+            "audio/34-ending.mp3",
+            "audio/metroidCut.mp3",
+            "audio/smb3_coin.mp3",
+            "audio/smb3_enter_level.wav",
+            "audio/smb3_fortress_clear.mp3",
+            "audio/smb3_game_over.mp3",
+            "audio/smb3_hurry_up.wav",
+            "audio/smb3_level_clear.mp3",
+            "audio/smb_touch (online-audio-converter.com).mp3",
+            "audio/smb_touch.wav",
+            "pokeSong/02.-pokemon-i-choose-you-(cut).mp3",
+            "pokeSong/02.-pokemon-i-choose-you-.mp3",
+            "pokeSong/08.-i-got-a-pokemon-.mp3",
+            "pokeSong/2-pokerap.mp3",
+            "pokeSong/3-pokerap.mp3",
+            "pokeSong/5-together-forever.mp3",
+            "pokeSong/mixpokerap.mp3"
+        ];
+
+        function preloadAssets() {
+            const total = allImageAssets.length + allAudioAssets.length;
+            let done = 0;
+
+            function markDone() {
+                done += 1;
+                preloadStatus.textContent = "Loading assets: " + done + "/" + total;
+                if (done >= total) {
+                    preloadStatus.textContent = "All images and audio loaded";
+                }
+            }
+
+            allImageAssets.forEach((path) => {
+                const img = new Image();
+                img.onload = markDone;
+                img.onerror = markDone;
+                img.src = path;
+            });
+
+            allAudioAssets.forEach((path) => {
+                const audio = new Audio();
+                let finished = false;
+                const complete = () => {
+                    if (!finished) {
+                        finished = true;
+                        markDone();
+                    }
+                };
+
+                audio.addEventListener("loadedmetadata", complete, { once: true });
+                audio.addEventListener("canplaythrough", complete, { once: true });
+                audio.addEventListener("error", complete, { once: true });
+                audio.preload = "auto";
+                audio.src = path;
+                audio.load();
+
+                setTimeout(complete, 2000);
+            });
         }
-    }
 
-    function charizardMoveRight(){
-        if(count <= window.innerWidth + 10){
-            chari.style.marginLeft = count + "px" ;
-            count = count + 7;
-        }else{
-            stopRight();
+        function start() {
+            if (leftInterval || rightInterval) return;
+
+            localStorage.setItem("mylives", lives);
+            localStorage.setItem("myscore1", 0);
+            localStorage.setItem("myscore2", 0);
+            localStorage.setItem("myscore3", 0);
+
+            preloadAssets();
+
+            bgm.volume = 0.4;
+            bgm.play().catch(() => {});
+
+            leftInterval = setInterval(charizardMoveLeft, 10);
+            playBtn.disabled = true;
         }
-    }
-    function stopLeft(){
-        clearInterval(left);
-        right = setInterval("charizardMoveRight()",10);
-    }
-    function stopRight(){
-        clearInterval(right);
-        document.location.assign('2.advancedPokemonGame_1.html');
-    }
-    
-    localStorage.setItem("mylives",lives);
 
-</script>
+        function charizardMoveLeft() {
+            if (count > 100) {
+                chari.style.left = count + "px";
+                count -= 2;
+            } else {
+                stopLeft();
+            }
+        }
+
+        function charizardMoveRight() {
+            if (count <= window.innerWidth + 20) {
+                chari.style.left = count + "px";
+                count += 7;
+            } else {
+                stopRight();
+            }
+        }
+
+        function stopLeft() {
+            clearInterval(leftInterval);
+            leftInterval = null;
+            rightInterval = setInterval(charizardMoveRight, 10);
+        }
+
+        function stopRight() {
+            clearInterval(rightInterval);
+            rightInterval = null;
+            window.location.assign("2.advancedPokemonGame_1.html");
+        }
+
+        playBtn.addEventListener("click", start);
+    </script>
 </body>
 </html>
